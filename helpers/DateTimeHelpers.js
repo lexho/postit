@@ -1,0 +1,11 @@
+let day = date.getDate();
+let month = date.getMonth() + 1;
+let year = date.getFullYear();
+let hours = date.getHours()
+let minutes = date.getMinutes()
+if (day < 10) day = '0' + day
+if (month < 10) month = '0' + month
+if (date.getHours() < 10) hours = '0' + date.getHours()
+if (date.getMinutes() < 10) minutes = '0' + date.getMinutes()
+const date1 = day + "." + month + "." + year
+const time = hours + ":" + minutes

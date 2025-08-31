@@ -1,0 +1,15 @@
+services:
+
+  db:
+    image: docker.dragonflydb.io/dragonflydb/dragonfly
+    ulimits:
+      memlock: -1
+    ports:
+      - 6380:6380
+    volumes:
+      - ./data:/data:Z
+
+  postit:
+    image: docker.io/lexho111/postit
+    ports:
+      - 8080:8080

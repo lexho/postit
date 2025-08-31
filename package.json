@@ -1,0 +1,23 @@
+{
+  "name": "postit",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test/copyFile.js && NODE_OPTIONS=--experimental-vm-modules npx jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "jest-environment-jsdom": "^30.0.5",
+    "redis": "^5.8.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "jest": "^30.0.5"
+  }
+}
