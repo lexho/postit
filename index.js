@@ -3,7 +3,8 @@ import cors from 'cors';
 import { from } from 'rxjs';
 import { filter, map, toArray } from 'rxjs/operators';
 //import { readFromFile, readFileRxJS, writeToFile, getAll, saveAll } from './storage.js'
-import { getAll, save, saveAll, saveDB, ip_address as redis_ip_address, port as redis_port } from './storage_redis.js'
+//import { getAll, save, saveAll, saveDB, ip_address as redis_ip_address, port as redis_port } from './storage_redis.js'
+import { readFileRxJS, writeToFile } from './storage_textfile.js'
 
 const app = express();
 app.use(express.json())
@@ -17,12 +18,12 @@ let count = 0
     <li><div class="time">01:12</div><div>zwei</div></li>
     <li><div class="time">01:13</div><div>drei</div></li>
     */
-//let storage = [];
+let storage = [];
 init();
 
 async function init() {
   //readFromFile().then(
-  //storage = await readFileRxJS();
+  storage = await readFileRxJS();
   //storage = await getAll();
   //storage = await getAll();
   /*getAll().then((data) => {
@@ -69,9 +70,10 @@ app.get('/api/postings/', async (req, res) => {
   }
   const sort = sort1
   console.log("sort:" + sort)
-  const storage = await getAll()
+  //const storage = await getAll()
   //console.log("storage: " + storage)
   console.log("storage: " + storage.length + " items loaded")
+  console.log("storage", storage)
 
 
 
@@ -83,7 +85,7 @@ app.get('/api/postings/', async (req, res) => {
         filter(item => item.text && item.text.toLowerCase().includes(hashtag)),
         map(item => ({ ...item, text: item.text.trim() })),
         toArray(),
-        map((arr) => sort == "desc" ? arr.sort((a, b) => b.id - a.id) : arr.sort((a, b) => a.id - b.id)) // Sort by id
+        map((arr) => sort == "desc" ? arr.sort((a, b) => b.time - a.time) : arr.sort((a, b) => a.time - b.time)) // Sort by id
       )
       .subscribe(filtered => {
         //console.log('Filtered storage:', filtered);
@@ -100,7 +102,7 @@ app.post('/api', (req, res) => {
   //console.log('text: ' + req.body.text)
   const text = req.body.text;
 
-  let time = new Date(req.body.time)
+  let time = JSON.parse(JSON.stringify(new Date(req.body.time)))
   let user = req.body.user
   //time1.setHours(time1.getHours() + offset); // set local timezone offset for docker
   //let adjustedTimestamp = (timestampInMillis - timezoneOffsetInMillis) / 1000;
@@ -117,12 +119,14 @@ app.post('/api', (req, res) => {
   const time = time1.getTime()*/
 
   //console.log('time: '+ time)
-  const item = { user: user, time: time, text: text }
-  save(item)
+  const item = { id: 0, user: user, time: time, text: text }
+  //save(item)
+  storage.push(item)
+  console.log("storage", storage)
 })
 
 setInterval(async () => {
-  await saveDB(() => { });
+  await writeToFile(storage);
 }, 15 * 60 * 1000) // every 15 minutes*/
 
 const ip_address = "localhost"
@@ -132,8 +136,6 @@ const server = app.listen(port, () => {
   console.log("************** POST IT! **************")
   console.log("express yourself!")
   //console.log('PostIt erreichbar unter http://localhost:8080');
-  console.log("redis ip: ", redis_ip_address)
-  console.log("redis port: ", redis_port)
   console.log(`API: http://${ip_address}:${port}/api/`)
   console.log("**************************************")
   console.log()
@@ -143,7 +145,7 @@ const server = app.listen(port, () => {
 async function handle(signal) {
   console.log(`Received ${signal}`);
   // can i force redis to write down the data?
-  await saveDB(() => { process.exit(1) });
+  await writeToFile(storage);
   process.exit(0); // Exit the process gracefully
 }
 
