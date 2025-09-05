@@ -1,6 +1,4 @@
 # PostIt!
-## starten
-docker run -p 6379:6379 --ulimit memlock=-1 docker.dragonflydb.io/dragonflydb/dragonfly
 
 ## node.js starten
 npm start
